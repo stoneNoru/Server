@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.autosave.lotto.model.mapper.LottoMapper">
+    <insert id="SaveAll" parameterType="java.util.List">
+        INSERT IGNORE INTO lotto (house_manage_no, pblanc_no, house_nm, hssply_adres, bsns_mby_nm, house_secd_nm, tot_suply_hshldco, rcept_bgnde, rcept_endde, przwner_presnatn_de, cntrct_cncls_bgnde, cntrct_cncls_endde, mvn_prearnge_ym, mdhs_telno, hmpg_adres, subscrpt_area_code_nm, pblanc_url)
+        VALUES
+        <foreach collection="list" item="lotto" separator=",">
+            (
+            #{lotto.houseManageNo},
+            #{lotto.pblancNo},
+            #{lotto.houseNo},
+            #{lotto.hssplyAdres},
+            #{lotto.bsnsMbyNm},
+            #{lotto.houseSecdNm},
+            #{lotto.totSuplyHshldco},
+            #{lotto.rceptBgnde},
+            #{lotto.rceptEndde},
+            #{lotto.przwnerPresnatnDe},
+            #{lotto.cntrctCnclsBgnde},
+            #{lotto.cntrctCnclsEndde},
+            #{lotto.mvnPrearngeYm},
+            #{lotto.mdhsTelno},
+            #{lotto.hmpgAdres},
+            #{lotto.subscrptAreaCodeNm},
+            #{lotto.pblancUrl}
+            )
+        </foreach>
+    </insert>
+</mapper>
+<!--    <insert id="SaveAll" parameterType="lotto">-->
+<!--        INSERT INTO lotto (-->
+<!--            HOUSE_MANAGE_NO,-->
+<!--            PBLANC_NO,-->
+<!--            HOUSE_NM,-->
+<!--            HSSPLY_ADRES,-->
+<!--            BSNS_MBY_NM,-->
+<!--            HOUSE_SECD_NM,-->
+<!--            TOT_SUPLY_HSHLDCO,-->
+<!--            RCEPT_BGNDE,-->
+<!--            RCEPT_ENDDE,-->
+<!--            PRZWNER_PRESNATN_DE,-->
+<!--            CNTRCT_CNCLS_BGNDE,-->
+<!--            CNTRCT_CNCLS_ENDDE,-->
+<!--            MVN_PREARNGE_YM,-->
+<!--            MDHS_TELNO,-->
+<!--            HMPG_ADRES,-->
+<!--            SUBSCRPT_AREA_CODE_NM,-->
+<!--            PBLANC_URL-->
+<!--        ) VALUES (-->
+<!--                     #{houseManageNo},-->
+<!--                     #{pblancNo},-->
+<!--                     #{houseNo},-->
+<!--                     #{hssplyAdres},-->
+<!--                     #{bsnsMbyNm},-->
+<!--                     #{houseSecdNm},-->
+<!--                     #{totSuplyHshldco},-->
+<!--                     #{rceptBgnde},-->
+<!--                     #{rceptEndde},-->
+<!--                     #{przwnerPresnatnDe},-->
+<!--                     #{cntrctCnclsBgnde},-->
+<!--                     #{cntrctCnclsEndde},-->
+<!--                     #{mvnPrearngeYm},-->
+<!--                     #{mdhsTelno},-->
+<!--                     #{hmpgAdres},-->
+<!--                     #{subscrptAreaCodeNm},-->
+<!--                     #{pblancUrl}-->
+<!--                 )-->
+<!--    </insert>-->
+<!--</mapper>-->
+
+<!--
+    //주택관리번호
+    @JsonProperty("HOUSE_MANAGE_NO")
+    private String house_MANAGE_NO;
+
+    @JsonProperty("PBLANC_NO")
+    private String pblanc_NO;
+
+    //주택명 및 주소
+    @JsonProperty("HOUSE_NM")
+    private String house_NM;
+
+    @JsonProperty("HSSPLY_ADRES")
+    private String hssply_ADRES;
+
+    //공급 주체
+    @JsonProperty("BSNS_MBY_NM")
+    private String bsns_MBY_NM;
+
+    //주택 유형
+    @JsonProperty("HOUSE_SECD_NM")
+    private String house_SECD_NM;
+    //공급 세대 수
+    @JsonProperty("TOT_SUPLY_HSHLDCO")
+    private int tot_SUPLY_HSHLDCO;
+
+    //청약 일정
+    @JsonProperty("RCEPT_BGNDE")
+    private String rcept_BGNDE;
+
+    @JsonProperty("RCEPT_ENDDE")
+    private String rcept_ENDDE;
+
+    @JsonProperty("PRZWNER_PRESNATN_DE")
+    private String przwner_PRESNATN_DE;
+
+    //계약일
+    @JsonProperty("CNTRCT_CNCLS_BGNDE")
+    private String cntrct_CNCLS_BGNDE;
+
+    @JsonProperty("CNTRCT_CNCLS_ENDDE")
+    private String cntrct_CNCLS_ENDDE;
+
+    //입주일
+    @JsonProperty("MVN_PREARNGE_YM")
+    private String mvn_PREARNGE_YM;
+
+    //문의처
+    @JsonProperty("MDHS_TELNO")
+    private String mdhs_TELNO;
+
+    @JsonProperty("HMPG_ADRES")
+    private String hmpg_ADRES;
+
+    @JsonProperty("SUBSCRPT_AREA_CODE_NM")
+    private String subscrpt_AREA_CODE_NM;
+
+    @JsonProperty("PBLANC_URL")
+    private String pblanc_URL;
+
+-->
