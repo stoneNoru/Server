@@ -13,7 +13,7 @@ public interface UserService {
     int findUser(User user);
 
     //내정보 조회
-    User findById(User user);
+    User findById(String id);
 
     //내 정보 수정
     int updateUser(User user);
