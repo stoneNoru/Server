@@ -27,7 +27,7 @@ public class JwtGenerator {
 	}
 	
 	//사용자 id로 토큰 생성하기
-	public JwtToken generateToken(String id) {
+	public JwtToken generateToken(String id, String auth) {
 		
 		//토큰 만료 시간 3시간
 		Date expireTime = new Date();
@@ -37,6 +37,7 @@ public class JwtGenerator {
 		String accessToken = Jwts.builder()
 				.setSubject(String.valueOf(id))
 				.setExpiration(expireTime)
+				.claim("auth", auth)
 				.signWith(key, SignatureAlgorithm.HS256)
 				.compact();
 		

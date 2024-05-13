@@ -51,7 +51,7 @@ public class LottoController {
 		return ResponseEntity.ok().body(lotto);
 	}
 	
-	@GetMapping
+	@GetMapping("/dds")
 	public ResponseEntity<?> getLottoBySido(@RequestParam String sido) {
 		
 		List<Lotto> list;

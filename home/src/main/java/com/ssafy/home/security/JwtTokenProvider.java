@@ -40,9 +40,9 @@ public class JwtTokenProvider {
         // Jwt 토큰 복호화
         Claims claims = parseClaims(accessToken);
 
-//        if (claims.get("auth") == null) {
-//            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
-//        }
+        if (claims.get("auth") == null) {
+            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
+        }
         
         // 클레임에서 권한 정보 가져오기
         Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("auth").toString().split(","))

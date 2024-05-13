@@ -43,7 +43,7 @@ public class UserController {
 		if(userInfo==null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 회원입니다.");
 
 		
-		JwtToken jwtToken = jwtGenerator.generateToken(userInfo.getId());
+		JwtToken jwtToken = jwtGenerator.generateToken(userInfo.getId(), "ROLE_USER");
 		
 		Cookie cookie = new Cookie("access_token", jwtToken.getAccessToken());
 		cookie.setPath("/");
