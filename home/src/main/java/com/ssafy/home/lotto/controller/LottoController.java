@@ -2,6 +2,8 @@ package com.ssafy.home.lotto.controller;
 
 import java.util.List;
 
+import com.ssafy.home.util.ResultDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,39 +30,35 @@ public class LottoController {
 	//전체 조회
 	@GetMapping
 	public ResponseEntity<?> selectAll(@RequestParam(required=false) String sido) {
-		
 		List<Lotto> list = lottoService.selectAll(sido);
-		
-		return ResponseEntity.ok().body(list);
+		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "전체 청약 조회 성공", list));
 	}
+
 	
 	//아이디로 조회
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getLotto(@PathVariable String id) {
-		
 		Lotto lotto = lottoService.findById(id);
-		
-		
-		return ResponseEntity.ok().body(lotto);
+		if (lotto == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultDto.res(HttpStatus.NOT_FOUND.value(), "해당 청약을 찾을 수 없습니다."));
+		}
+		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "청약 조회 성공", lotto));
 	}
-	
-	
+
+
+
 	@GetMapping("/new")
 	public ResponseEntity<?> getNewLotto() {
-		
 		List<Lotto> lotto = lottoService.findNewLotto();
-		
-		
-		return ResponseEntity.ok().body(lotto);
+		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "최신 청약 조회 성공", lotto));
 	}
+
 
 	@GetMapping("/current")
 	public ResponseEntity<?> getCurrentLotto() {
-		
-		List<Lotto>  lotto = lottoService.findCurrentLotto();
-		
-		
-		return ResponseEntity.ok().body(lotto);
+		List<Lotto> lotto = lottoService.findCurrentLotto();
+		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "진행 중인 청약 조회 성공", lotto));
 	}
+
 
 }

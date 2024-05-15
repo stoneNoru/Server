@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ssafy.home.util.ResultDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,48 +44,49 @@ public class UserController {
 	public ResponseEntity<?> removeToken(@RequestHeader("authorization") HttpHeaders tokenHeader) {
 		log.info("logout");
 		User userInfo = null;
-		
+
 		List<String> authorizationHeader = tokenHeader.get(HttpHeaders.AUTHORIZATION);
 		if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-	        String token = authorizationHeader.get(0); // 여기서 토큰 값을 가져올 수 있음
-	        log.info(token);
-	        String id = jwtUtil.getUserId(token);
-	        try {
+			String token = authorizationHeader.get(0);
+			log.info(token);
+			String id = jwtUtil.getUserId(token);
+			try {
 				userService.deleteRefreshToken(id);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
-	        
-	    } else {
-	        // Authorization 헤더가 없는 경우에 대한 처리
-	    	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증에 실패했습니다.");
-	    }
+		} else {
+			// Authorization 헤더가 없는 경우에 대한 처리
+			return ResponseEntity.unprocessableEntity().body(ResultDto.res(HttpStatus.UNAUTHORIZED.value(), "인증에 실패했습니다."));
+		}
 
-		
-		return ResponseEntity.ok().body("로그아웃에 성공했습니다.");
+		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "로그아웃에 성공했습니다."));
 	}
+
 	
 	@PostMapping("/refresh")
 	public ResponseEntity<?> refreshToken(@RequestBody User user, HttpServletRequest request)
 			throws Exception {
 		Map<String, Object> resultMap = new HashMap<>();
 		HttpStatus status = HttpStatus.ACCEPTED;
+		String message = "";
 		String token = request.getHeader("refreshToken");
 		log.debug("token : {}, memberDto : {}", token, user);
 		if (jwtUtil.checkToken(token)) {
 			if (token.equals(userService.getRefreshToken(user.getId()))) {
 				String accessToken = jwtUtil.createAccessToken(user.getId());
 				log.debug("token : {}", accessToken);
-				log.debug("정상적으로 access token 재발급!!!");
+				message  = "정상적으로 access token 재발급!!!";
+
 				resultMap.put("access-token", accessToken);
 				status = HttpStatus.CREATED;
 			}
 		} else {
-			log.debug("refresh token 도 사용 불가!!!!!!!");
+			message = "refresh token 도 사용 불가!!!!!!!";
 			status = HttpStatus.UNAUTHORIZED;
 		}
-		return new ResponseEntity<Map<String, Object>>(resultMap, status);
+		return ResponseEntity.ok(ResultDto.res(status.value(), message, resultMap));
 	}
 	
 
@@ -110,13 +112,11 @@ public class UserController {
 			System.out.println(resultMap.get("refresh-token"));
 			
 		} catch (Exception e) {
-			return ResponseEntity
-					.notFound().build();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultDto.res(HttpStatus.NOT_FOUND.value(), "로그인에 실패 했습니다."));
 		}
 
 		
-//		System.out.println(cookie.toString());
-		return ResponseEntity.status(HttpStatus.CREATED).body(resultMap);
+		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "로그인에 성공했습니다.", resultMap));
 	}
 
 	//회원가입
@@ -126,79 +126,78 @@ public class UserController {
 			String token = userService.regist(user);
 
 			if (token != null) {
-				return ResponseEntity.ok(token);
+				return ResponseEntity.ok(new ResultDto(HttpStatus.CREATED.value(), "회원가입에 성공했습니다.", token));
 			} else {
-				return ResponseEntity.status(HttpStatus.CONFLICT).body("회원가입에 실패했습니다.");
+				return ResponseEntity.status(HttpStatus.CONFLICT.value()).body(new ResultDto(HttpStatus.CONFLICT.value(), "회원가입에 실패했습니다."));
 			}
 		} catch (Exception ex) {
-			// 예외 처리 로직
-			return ResponseEntity.status(DuplicateHttpStatus.DUPLICATE.value()).body("중복된 회원이 존재합니다.");
+			return ResponseEntity.status(DuplicateHttpStatus.DUPLICATE.value()).body(new ResultDto(DuplicateHttpStatus.DUPLICATE.value(), "중복된 회원이 존재합니다."));
 		}
 	}
+
+
 
 	//중복 체크
 	@GetMapping("/check")
 	public ResponseEntity<?> duplicateCheck(@RequestParam(required = false) String email,
-			@RequestParam(required = false) String id,
-			@RequestParam(required = false) String nickname) {
-		//이메일 중복체크
+											@RequestParam(required = false) String id,
+											@RequestParam(required = false) String nickname) {
 		if (email != null) {
 			User user = new User();
 			user.setEmail(email);
 			int result = userService.findUser(user);
 			if (result > 0) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 존재하는 이메일입니다.");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(new ResultDto(HttpStatus.BAD_REQUEST.value(), "이미 존재하는 이메일입니다."));
 			}
 		}
 
-		//아이디 중복체크
 		if (id != null) {
 			User user = new User();
 			user.setId(id);
 			int result = userService.findUser(user);
 			if (result > 0) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 존재하는 아이디입니다.");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(new ResultDto(HttpStatus.BAD_REQUEST.value(), "이미 존재하는 아이디입니다."));
 			}
 		}
 
-		//닉네임 중복체크
 		if (nickname != null) {
 			User user = new User();
 			user.setNickname(nickname);
 			int result = userService.findUser(user);
 			if (result > 0) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 존재하는 닉네임입니다.");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(new ResultDto(HttpStatus.BAD_REQUEST.value(), "이미 존재하는 닉네임입니다."));
 			}
 		}
 
 		return ResponseEntity.ok().build();
 	}
 
+
+
 	//내정보 조회
 	@GetMapping
 	public ResponseEntity<?> getUserInfo(@RequestHeader("authorization") HttpHeaders tokenHeader) {
-		System.out.println("header : " + tokenHeader);
-		
 		User userInfo = null;
-		
+
 		List<String> authorizationHeader = tokenHeader.get(HttpHeaders.AUTHORIZATION);
 		if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
-	        String token = authorizationHeader.get(0); // 여기서 토큰 값을 가져올 수 있음
-	        log.info(token);
-	        String id = jwtUtil.getUserId(token);
-	        userInfo = userService.findById(id);
-	        
-	    } else {
-	        // Authorization 헤더가 없는 경우에 대한 처리
-	    	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증에 실패했습니다.");
-	    }
+			String token = authorizationHeader.get(0);
+			log.info(token);
+			String id = jwtUtil.getUserId(token);
+			userInfo = userService.findById(id);
 
-		if(userInfo == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저 정보를 찾을 수 없습니다.");
+		} else {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(new ResultDto(HttpStatus.UNAUTHORIZED.value(), "인증에 실패했습니다."));
+		}
+
+		if (userInfo == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "유저 정보를 찾을 수 없습니다."));
 		}
 
 		return ResponseEntity.ok(userInfo);
 	}
+
+
 
 
 	//내정보 수정
@@ -207,28 +206,30 @@ public class UserController {
 		try {
 			int result = userService.updateUser(user);
 			if (result > 0) {
-				return ResponseEntity.ok().build();
+				return ResponseEntity.ok().body(new ResultDto(HttpStatus.OK.value(), "수정에 성공했습니다."));
 			} else {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("수정에 실패했습니다.");
+				return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "수정에 실패했습니다."));
 			}
 		} catch (Exception ex) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("수정에 실패했습니다.");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "수정에 실패했습니다."));
 		}
 	}
 
+
 	//내정보 삭제
-	@DeleteMapping
+	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable String id) {
 		try {
 			int result = userService.deleteUser(id);
 			if (result > 0) {
-				return ResponseEntity.ok().build();
+				return ResponseEntity.ok().body(new ResultDto(HttpStatus.OK.value(), "삭제에 성공했습니다."));
 			} else {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제에 실패했습니다.");
+				return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "삭제에 실패했습니다."));
 			}
 		} catch (Exception ex) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제에 실패했습니다.");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "삭제에 실패했습니다."));
 		}
 	}
+
 
 }
