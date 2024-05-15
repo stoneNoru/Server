@@ -1,6 +1,5 @@
 package com.ssafy.home.lotto.controller;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -25,43 +24,43 @@ public class LottoController {
 	
 	private final LottoService lottoService;
 	
+	
+	//전체 조회
 	@GetMapping
-	public ResponseEntity<?> getSubscription() {
+	public ResponseEntity<?> selectAll(@RequestParam(required=false) String sido) {
 		
-		List<Lotto> list;
-		try {
-			list = lottoService.selectAll();
-		} catch (IOException e) {
-			return ResponseEntity.notFound().build();
-		}
+		List<Lotto> list = lottoService.selectAll(sido);
 		
 		return ResponseEntity.ok().body(list);
 	}
 	
+	//아이디로 조회
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getLotto(@PathVariable String id) {
 		
-		Lotto lotto;
-		try {
-			lotto = lottoService.findById(id);
-		} catch (IOException e) {
-			return ResponseEntity.notFound().build();
-		}
+		Lotto lotto = lottoService.findById(id);
+		
 		
 		return ResponseEntity.ok().body(lotto);
 	}
 	
-	@GetMapping("/dds")
-	public ResponseEntity<?> getLottoBySido(@RequestParam String sido) {
+	
+	@GetMapping("/new")
+	public ResponseEntity<?> getNewLotto() {
 		
-		List<Lotto> list;
-		try {
-			list = lottoService.findBySido(sido);
-		} catch (IOException e) {
-			return ResponseEntity.notFound().build();
-		}
+		List<Lotto> lotto = lottoService.findNewLotto();
 		
-		return ResponseEntity.ok().body(list);
+		
+		return ResponseEntity.ok().body(lotto);
+	}
+
+	@GetMapping("/current")
+	public ResponseEntity<?> getCurrentLotto() {
+		
+		List<Lotto>  lotto = lottoService.findCurrentLotto();
+		
+		
+		return ResponseEntity.ok().body(lotto);
 	}
 
 }
