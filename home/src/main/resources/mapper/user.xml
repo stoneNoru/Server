@@ -5,9 +5,9 @@
 <mapper namespace="com.ssafy.home.user.model.mapper.UserMapper">
     <!-- 로그인 -->
     <select id="login" parameterType="user" resultType="user">
-        select id, email, nickname
+        select id, email, nickname, password
         from user
-        where id=#{id} and password=#{password}
+        where id=#{id}
     </select>
 
     <!-- 등록 -->
@@ -51,6 +51,24 @@
         from user
         where id=#{id}
     </delete>
+    
+    <update id="saveRefreshToken" parameterType="map">
+		update user
+		set token = #{token}
+		where id = #{userId}
+	</update>
+	
+	<select id="getRefreshToken" parameterType="string" resultType="string">
+		select token
+		from user
+		where id = #{userId}
+	</select>
+	
+	<update id="deleteRefreshToken" parameterType="map">
+		update user
+		set token = #{token, jdbcType=VARCHAR}
+		where id = #{userId}
+	</update>
 </mapper>
 
         <!--     //내 정보 수정

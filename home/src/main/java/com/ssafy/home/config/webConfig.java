@@ -1,9 +1,60 @@
 package com.ssafy.home.config;
 
-import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.ssafy.home.interceptor.JWTInterceptor;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
-@MapperScan(basePackages = "com.ssafy.home.*.model.mapper")
-public class webConfig {
+@RequiredArgsConstructor
+public class WebConfig implements WebMvcConfigurer {
+	private final JWTInterceptor jwtInterceptor;
+
+	/*
+	 * @Bean public BCryptPasswordEncoder passwordEncoder(){ return new
+	 * BCryptPasswordEncoder(); }
+	 */
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		// JWTInterceptor를 등록하고, 로그인과 관련된 URL 패턴을 제외합니다.
+		registry.addInterceptor(jwtInterceptor)
+		.addPathPatterns("applies/**");
+		//.excludePathPatterns("/users/**", "/users"); // 로그인 관련 URL 패턴을 제외합니다.
+	}
+
+//	@Override
+//	public void addCorsMappings(CorsRegistry registry) {
+//		registry
+//			.addMapping("/**")
+//			.allowedOrigins("*")
+//			.allowedMethods(HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(),
+//						HttpMethod.DELETE.name(), HttpMethod.HEAD.name(), HttpMethod.OPTIONS.name(),
+//						HttpMethod.PATCH.name())
+//			; // Pre-flight Caching
+//	}
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("users/**")
+		.allowedOrigins("*")
+		.allowedMethods("POST");
+		registry.addMapping("applies/**")
+		.allowedOrigins("*")
+		.allowedMethods("GET","POST","PUT","DELETE","OPTIONS");
+	}
+	
+
+	@Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/img/**").addResourceLocations("classpath:/static/assets/img/");
+		registry.addResourceHandler("/*.html**").addResourceLocations("classpath:/static/");
+    }
+
+	
 }

@@ -1,5 +1,9 @@
 package com.ssafy.home.user.controller;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,56 +20,113 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.home.config.DuplicateHttpStatus;
-import com.ssafy.home.config.auth.dto.JwtToken;
-import com.ssafy.home.security.JwtGenerator;
 import com.ssafy.home.user.dto.User;
 import com.ssafy.home.user.model.service.UserService;
+import com.ssafy.home.util.JWTUtil;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
-@CrossOrigin("*")
+@Slf4j
 public class UserController {
 	private final UserService userService;
-	private final JwtGenerator jwtGenerator;
+//	private final JwtGenerator jwtGenerator;
+//	private final JWTProvider jwtProvider;
+	private final JWTUtil jwtUtil;
+	
+	//로그아웃
+	@GetMapping("/logout")
+	public ResponseEntity<?> removeToken(@RequestHeader("authorization") HttpHeaders tokenHeader) {
+		log.info("logout");
+		User userInfo = null;
+		
+		List<String> authorizationHeader = tokenHeader.get(HttpHeaders.AUTHORIZATION);
+		if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
+	        String token = authorizationHeader.get(0); // 여기서 토큰 값을 가져올 수 있음
+	        log.info(token);
+	        String id = jwtUtil.getUserId(token);
+	        try {
+				userService.deleteRefreshToken(id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+	        
+	    } else {
+	        // Authorization 헤더가 없는 경우에 대한 처리
+	    	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증에 실패했습니다.");
+	    }
+
+		
+		return ResponseEntity.ok().body("로그아웃에 성공했습니다.");
+	}
+	
+	@PostMapping("/refresh")
+	public ResponseEntity<?> refreshToken(@RequestBody User user, HttpServletRequest request)
+			throws Exception {
+		Map<String, Object> resultMap = new HashMap<>();
+		HttpStatus status = HttpStatus.ACCEPTED;
+		String token = request.getHeader("refreshToken");
+		log.debug("token : {}, memberDto : {}", token, user);
+		if (jwtUtil.checkToken(token)) {
+			if (token.equals(userService.getRefreshToken(user.getId()))) {
+				String accessToken = jwtUtil.createAccessToken(user.getId());
+				log.debug("token : {}", accessToken);
+				log.debug("정상적으로 access token 재발급!!!");
+				resultMap.put("access-token", accessToken);
+				status = HttpStatus.CREATED;
+			}
+		} else {
+			log.debug("refresh token 도 사용 불가!!!!!!!");
+			status = HttpStatus.UNAUTHORIZED;
+		}
+		return new ResponseEntity<Map<String, Object>>(resultMap, status);
+	}
+	
 
 	//로그인
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody User user, HttpServletRequest req, HttpServletResponse rep) {
-		System.out.println(user);
+	public ResponseEntity<?> login(@RequestBody User user) {
+		
 		User userInfo = userService.login(user);
 
 		if(userInfo==null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 회원입니다.");
+		
+
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		try {
+			String accessToken = jwtUtil.createAccessToken(userInfo.getId());
+			String refreshToken = jwtUtil.createRefreshToken(userInfo.getId());
+			
+			userService.saveRefreshToken(userInfo.getId(), refreshToken);
+			resultMap.put("access-token", accessToken);
+			resultMap.put("refresh-token", refreshToken);
+			
+			System.out.println(resultMap.get("access-token"));
+			System.out.println(resultMap.get("refresh-token"));
+			
+		} catch (Exception e) {
+			return ResponseEntity
+					.notFound().build();
+		}
 
 		
-		JwtToken jwtToken = jwtGenerator.generateToken(userInfo.getId(), "ROLE_USER");
-		
-		Cookie cookie = new Cookie("access_token", jwtToken.getAccessToken());
-		cookie.setPath("/");
-		cookie.setMaxAge(60 * 60 * 24 * 1); // 유효기간 1일
-		cookie.setHttpOnly(false);
-		
-		rep.addCookie(cookie);
-		
 //		System.out.println(cookie.toString());
-		return ResponseEntity
-				.ok()
-				.body(userInfo);
+		return ResponseEntity.status(HttpStatus.CREATED).body(resultMap);
 	}
 
 	//회원가입
 	@PostMapping
 	public ResponseEntity<?> regist(@RequestBody User user) {
 		try {
-			int result = userService.regist(user);
+			String token = userService.regist(user);
 
-			if (result > 0) {
-				return ResponseEntity.ok().body("회원가입에 성공했습니다.");
+			if (token != null) {
+				return ResponseEntity.ok(token);
 			} else {
 				return ResponseEntity.status(HttpStatus.CONFLICT).body("회원가입에 실패했습니다.");
 			}
@@ -114,10 +175,23 @@ public class UserController {
 	}
 
 	//내정보 조회
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getUserInfo(@RequestHeader HttpHeaders header, @PathVariable String id) {
-		System.out.println("header : " + header.getFirst("Authorization"));
-		User userInfo = userService.findById(id);
+	@GetMapping
+	public ResponseEntity<?> getUserInfo(@RequestHeader("authorization") HttpHeaders tokenHeader) {
+		System.out.println("header : " + tokenHeader);
+		
+		User userInfo = null;
+		
+		List<String> authorizationHeader = tokenHeader.get(HttpHeaders.AUTHORIZATION);
+		if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
+	        String token = authorizationHeader.get(0); // 여기서 토큰 값을 가져올 수 있음
+	        log.info(token);
+	        String id = jwtUtil.getUserId(token);
+	        userInfo = userService.findById(id);
+	        
+	    } else {
+	        // Authorization 헤더가 없는 경우에 대한 처리
+	    	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증에 실패했습니다.");
+	    }
 
 		if(userInfo == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저 정보를 찾을 수 없습니다.");
@@ -128,8 +202,8 @@ public class UserController {
 
 
 	//내정보 수정
-	@PutMapping("/{id}")
-	public ResponseEntity<?> updateUserInfo(@RequestBody User user, @PathVariable String id) {
+	@PutMapping
+	public ResponseEntity<?> updateUserInfo(@RequestBody User user, @RequestHeader("authorization") HttpHeaders tokenHeader) {
 		try {
 			int result = userService.updateUser(user);
 			if (result > 0) {
@@ -143,7 +217,7 @@ public class UserController {
 	}
 
 	//내정보 삭제
-	@DeleteMapping("/{id}")
+	@DeleteMapping
 	public ResponseEntity<?> deleteUser(@PathVariable String id) {
 		try {
 			int result = userService.deleteUser(id);
@@ -156,4 +230,5 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제에 실패했습니다.");
 		}
 	}
+
 }

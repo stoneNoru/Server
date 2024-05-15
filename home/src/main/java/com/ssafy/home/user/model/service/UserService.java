@@ -4,7 +4,7 @@ import com.ssafy.home.user.dto.User;
 
 public interface UserService {
     //회원 가입
-    int regist(User user);
+    String regist(User user);
 
     //로그인
     User login(User user);
@@ -20,4 +20,10 @@ public interface UserService {
 
     //회원 탈퇴
     int deleteUser(String id);
+
+	void saveRefreshToken(String id, String refreshToken)  throws Exception;
+
+	void deleteRefreshToken(String userId) throws Exception;
+
+	Object getRefreshToken(String id) throws Exception;
 }
