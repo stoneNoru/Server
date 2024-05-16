@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import com.ssafy.home.lotto.dto.Lotto;
 @Repository
 public interface LottoMapper {
-	public List<Lotto> selectAll(String sido);
+	public List<Lotto> selectEndLotto();
 
 	public Lotto findById(String id);
 	

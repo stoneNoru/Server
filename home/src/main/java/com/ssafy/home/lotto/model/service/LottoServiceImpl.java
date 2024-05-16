@@ -16,8 +16,8 @@ public class LottoServiceImpl implements LottoService {
 	private final LottoMapper lottoMapper;
 
 	@Override
-	public List<Lotto> selectAll(String sido) {
-		return lottoMapper.selectAll(sido);
+	public List<Lotto> selectEndLotto() {
+		return lottoMapper.selectEndLotto();
 	}
 
 	@Override

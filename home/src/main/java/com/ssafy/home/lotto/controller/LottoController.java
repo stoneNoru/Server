@@ -26,15 +26,6 @@ public class LottoController {
 	
 	private final LottoService lottoService;
 	
-	
-	//전체 조회
-	@GetMapping
-	public ResponseEntity<?> selectAll(@RequestParam(required=false) String sido) {
-		List<Lotto> list = lottoService.selectAll(sido);
-		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "전체 청약 조회 성공", list));
-	}
-
-	
 	//아이디로 조회
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getLotto(@PathVariable String id) {
@@ -45,7 +36,12 @@ public class LottoController {
 		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "청약 조회 성공", lotto));
 	}
 
-
+	//종료된 거 조회
+	@GetMapping("/end")
+	public ResponseEntity<?> selectEndLotto() {
+		List<Lotto> list = lottoService.selectEndLotto();
+		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "종료된 청약 조회 성공", list));
+	}
 
 	@GetMapping("/new")
 	public ResponseEntity<?> getNewLotto() {

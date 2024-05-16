@@ -5,7 +5,7 @@ import java.util.List;
 import com.ssafy.home.lotto.dto.Lotto;
 
 public interface LottoService {
-	public List<Lotto> selectAll(String sido);
+	public List<Lotto> selectEndLotto();
 
 	public Lotto findById(String id);
 

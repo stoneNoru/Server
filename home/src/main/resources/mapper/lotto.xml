@@ -5,13 +5,12 @@
 <mapper namespace="com.ssafy.home.lotto.model.mapper.LottoMapper">
 
 
-    <select id="selectAll" resultType="lotto">
+    <select id="selectEndLotto" resultType="lotto">
         select *
         from lotto
-        WHERE cntrct_cncls_endde >= CURDATE()
-        <if test="sido !=null">
-        and subscrpt_area_code_nm = #{sido}
-        </if>
+        WHERE rcept_endde &lt; CURDATE()
+        and YEAR(rcept_endde) = YEAR(CURDATE()) 
+  		AND MONTH(rcept_endde) = MONTH(CURDATE())
     </select>
     
     <select id="findById" resultType="lotto">
