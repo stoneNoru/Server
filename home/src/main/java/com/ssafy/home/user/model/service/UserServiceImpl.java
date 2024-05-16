@@ -32,9 +32,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User login(User user) {
-		String id = user.getId();
-		String password = user.getPassword();	//사용자가 입력한 정보
-		
 		User userInfo = userMapper.login(user);	//DB로부터 조회한 정보
 		System.out.println(userInfo+" userInfo");
 		if(userInfo==null || !passwordEncoder.matches(user.getPassword(), userInfo.getPassword()) ) return null;
