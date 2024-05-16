@@ -17,10 +17,6 @@ import lombok.RequiredArgsConstructor;
 public class WebConfig implements WebMvcConfigurer {
 	private final JWTInterceptor jwtInterceptor;
 
-	/*
-	 * @Bean public BCryptPasswordEncoder passwordEncoder(){ return new
-	 * BCryptPasswordEncoder(); }
-	 */
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		// JWTInterceptor를 등록하고, 로그인과 관련된 URL 패턴을 제외합니다.
@@ -29,26 +25,15 @@ public class WebConfig implements WebMvcConfigurer {
 		//.excludePathPatterns("/users/**", "/users"); // 로그인 관련 URL 패턴을 제외합니다.
 	}
 
-//	@Override
-//	public void addCorsMappings(CorsRegistry registry) {
-//		registry
-//			.addMapping("/**")
-//			.allowedOrigins("*")
-//			.allowedMethods(HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(),
-//						HttpMethod.DELETE.name(), HttpMethod.HEAD.name(), HttpMethod.OPTIONS.name(),
-//						HttpMethod.PATCH.name())
-//			; // Pre-flight Caching
-//	}
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("users/**")
-		.allowedOrigins("*")
-		.allowedMethods("POST");
+				.allowedOrigins("*")
+				.allowedMethods("POST");
 		registry.addMapping("applies/**")
-		.allowedOrigins("*")
-		.allowedMethods("GET","POST","PUT","DELETE","OPTIONS");
+				.allowedOrigins("*")
+				.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
 	}
-	
 
 	@Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
