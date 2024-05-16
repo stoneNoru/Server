@@ -16,5 +16,6 @@ public class DealDto {
 	private long aptCode;
 	private String lng;
 	private String lat;
+	private String date;
 	
 }

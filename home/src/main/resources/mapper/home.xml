@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.home.apt.model.mapper.HomeMapper">
+    <select id="selectByKeyword" resultType="searchDto">
+	select d.sidoName, d.gugunName, d.dongName, h.apartmentName
+	from dongcode d join houseinfo h
+	on d.dongCode = h.dongcode
+	where 
+	 	h.apartmentName LIKE CONCAT('%', #{keyword}, '%')
+        OR CONCAT(d.sidoName, ' ', d.gugunName, ' ', d.dongName) LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+    
+    <select id="selectByPosition" resultType="dealDto">
+    select i.aptCode
+	from houseinfo i join housedeal d
+	on i.aptCode = d.aptCode
+	where i.lng &gt;= #{west} and i.lng &lt;= #{east}
+	and i.lat &gt;= #{south} and i.lat &lt;= #{north}
+	group by i.aptCode
+    </select>
+
+	<select id="selectByNew" resultType="dealDto">
+	    SELECT *, CONCAT(d.dealYear, '-', d.dealMonth, '-', d.dealDay) AS date
+	    FROM housedeal d join houseinfo i
+	    on d.aptCode = i.aptCode
+	    WHERE d.aptCode = #{aptCode}
+	    ORDER BY date DESC
+	    LIMIT 1;
+	</select>
+	
+	<select id="selectByCode" resultType="dealDto">
+	    SELECT *, CONCAT(d.dealYear, '-', d.dealMonth, '-', d.dealDay) AS date
+	    FROM housedeal d join houseinfo i
+	    on d.aptCode = i.aptCode
+	    WHERE d.aptCode = #{aptCode}
+	    order by date desc
+	    limit 10;
+	</select>
+
+</mapper>
+
+
