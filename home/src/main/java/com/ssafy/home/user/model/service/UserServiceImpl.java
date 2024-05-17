@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
 		User userInfo = userMapper.login(user);	//DB로부터 조회한 정보
 		System.out.println(userInfo+" userInfo");
 		if(userInfo==null || !passwordEncoder.matches(user.getPassword(), userInfo.getPassword()) ) return null;
-		
+		userInfo.setPassword(null);
 		return userInfo;
     }
 
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
     }
     
 	@Override
-	public void saveRefreshToken(String userId, String refreshToken) throws Exception {
+	public void saveRefreshToken(String userId, String refreshToken) {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("userId", userId);
 		map.put("token", refreshToken);
@@ -68,12 +68,12 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public Object getRefreshToken(String userId) throws Exception {
+	public Object getRefreshToken(String userId) {
 		return userMapper.getRefreshToken(userId);
 	}
 	
 	@Override
-	public void deleteRefreshToken(String userId) throws Exception {
+	public void deleteRefreshToken(String userId) {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("userId", userId);
 		map.put("token", null);

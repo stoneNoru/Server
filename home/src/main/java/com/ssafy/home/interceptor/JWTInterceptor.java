@@ -5,7 +5,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import com.ssafy.home.config.UnAuthorizedException;
+import com.ssafy.home.exception.UnAuthorizedException;
 import com.ssafy.home.util.JWTUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
