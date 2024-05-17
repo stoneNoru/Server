@@ -7,8 +7,10 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.ssafy.home.apt.dto.AptBookmarkDto;
 import com.ssafy.home.apt.dto.DealDto;
 import com.ssafy.home.apt.dto.PositionDto;
+import com.ssafy.home.apt.dto.ResultAptBookmarkDto;
 import com.ssafy.home.apt.dto.SearchDto;
 import com.ssafy.home.apt.model.mapper.HomeMapper;
 
@@ -39,9 +41,25 @@ public class HomeServiceImpl implements HomeService{
 
 	@Override
 	public List<DealDto> selectByCode(String aptCode) {
-		return homeMapper.selectByCode(aptCode);
+		return homeMapper.selectByCode(aptCode, 10);
+	}
+
+
+	@Override
+	public int registBookmark(AptBookmarkDto bookmark) {
+		return homeMapper.registBookmark(bookmark);
+	}
+
+	@Override
+	public List<ResultAptBookmarkDto> findBookmarkDetailsByUserId(String id) {
+		return homeMapper.findBookmarkDetailsByUserId(id);
+	}
+
+	@Override
+	public int deleteBookmark(String userId, String aptCode) {
+		return homeMapper.deleteBookmark(userId, aptCode);
 	}
     
-    
+	
     
 }

@@ -13,7 +13,7 @@ public class DealDto {
 	private String floor;
 	private String area;
 	private String apartmentName;
-	private long aptCode;
+	private String aptCode;
 	private String lng;
 	private String lat;
 	private String date;
