@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.home.review.model.mapper.ReviewMapper">
+	<select id="findByApplyId">
+		select *
+		from lotto_review
+		where house_manage_no = #{id}
+	</select>
+	
+    <insert id="regist" parameterType="reviewDto">
+        insert into lotto_review(content, nickname, house_manage_no)
+        values(#{content}, #{nickname}, #{houseManageNo})
+    </insert>
+    
+    <delete id="deleteById">
+    	delete
+    	from lotto_review
+    	where id = #{id} and nickname = #{userId}
+    </delete>
+</mapper>
+
+        <!--     //내 정보 수정
+            int updateUser(User user);
+
+            //회원 탈퇴
+            int deleteUser(String id); -->
+
