@@ -32,6 +32,24 @@
     </select>
 
 
+	<insert id="registBookmark" parameterType="lottoBookmarkDto">
+        insert into lotto_subscription(house_manage_no, user_id)
+        values(#{houseManageNo}, #{userId})
+    </insert>
+	
+	<select id="findBookmarkDetailsByUserId" resultType="lotto">
+		select *
+		from lotto_subscription s join lotto l
+		on s.house_manage_no = l.house_manage_no
+		where s.user_id = #{userId}
+	</select>
+
+	<delete id="deleteBookmark">
+		delete
+		from lotto_subscription
+		where house_manage_no=#{houseManageNo} and user_id=#{userId}
+	</delete>
+
 </mapper>
 
 

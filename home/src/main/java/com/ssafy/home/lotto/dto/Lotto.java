@@ -14,6 +14,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class Lotto {
+	private String houseManageNo;
 
 	private String pblancNo;
 
