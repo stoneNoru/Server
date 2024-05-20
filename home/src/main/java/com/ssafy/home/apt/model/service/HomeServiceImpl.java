@@ -1,5 +1,6 @@
 package com.ssafy.home.apt.model.service;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.ssafy.home.apt.dto.AptBookmarkDto;
 import com.ssafy.home.apt.dto.DealDto;
 import com.ssafy.home.apt.dto.PositionDto;
-import com.ssafy.home.apt.dto.ResultAptBookmarkDto;
+import com.ssafy.home.apt.dto.ResultBookmarkDto;
 import com.ssafy.home.apt.dto.SearchDto;
 import com.ssafy.home.apt.model.mapper.HomeMapper;
 
@@ -51,7 +52,7 @@ public class HomeServiceImpl implements HomeService{
 	}
 
 	@Override
-	public List<ResultAptBookmarkDto> findBookmarkDetailsByUserId(String id) {
+	public List<ResultBookmarkDto> findBookmarkDetailsByUserId(String id) {
 		return homeMapper.findBookmarkDetailsByUserId(id);
 	}
 

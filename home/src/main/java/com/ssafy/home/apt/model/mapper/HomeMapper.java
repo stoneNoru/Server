@@ -1,12 +1,13 @@
 package com.ssafy.home.apt.model.mapper;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Map;
 
 import com.ssafy.home.apt.dto.AptBookmarkDto;
 import com.ssafy.home.apt.dto.DealDto;
 import com.ssafy.home.apt.dto.PositionDto;
-import com.ssafy.home.apt.dto.ResultAptBookmarkDto;
+import com.ssafy.home.apt.dto.ResultBookmarkDto;
 import com.ssafy.home.apt.dto.SearchDto;
 
 public interface HomeMapper {
@@ -21,7 +22,7 @@ public interface HomeMapper {
 	
 	int registBookmark(AptBookmarkDto bookmark);
 	
-	List<ResultAptBookmarkDto> findBookmarkDetailsByUserId(String id);
+	List<ResultBookmarkDto> findBookmarkDetailsByUserId(String id);
 	
 	int deleteBookmark(String userId, String aptCode);
 }

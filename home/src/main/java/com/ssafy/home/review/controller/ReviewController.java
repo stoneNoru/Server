@@ -41,8 +41,8 @@ public class ReviewController {
 	private final JWTUtil jwtUtil;
     private final AuthorizationUtils authorizationUtils;
 
-	@GetMapping("/{apply-id}")
-	public ResponseEntity<?> findByApplyId(@PathVariable("apply-id") String id) {
+	@GetMapping("/{id}")
+	public ResponseEntity<?> findByApplyId(@PathVariable("id") String id) {
 
 		List<ReviewDto> list = reviewService.findByApplyId(id);		
 

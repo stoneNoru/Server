@@ -17,7 +17,7 @@
     <delete id="deleteById">
     	delete
     	from lotto_review
-    	where id = #{id} and nickname = #{userId}
+    	where id = #{id} and nickname = #{nickname}
     </delete>
 </mapper>
 

@@ -1,11 +1,12 @@
 package com.ssafy.home.apt.model.service;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 import com.ssafy.home.apt.dto.AptBookmarkDto;
 import com.ssafy.home.apt.dto.DealDto;
 import com.ssafy.home.apt.dto.PositionDto;
-import com.ssafy.home.apt.dto.ResultAptBookmarkDto;
+import com.ssafy.home.apt.dto.ResultBookmarkDto;
 import com.ssafy.home.apt.dto.SearchDto;
 
 public interface HomeService {
@@ -18,7 +19,7 @@ public interface HomeService {
 
 	int registBookmark(AptBookmarkDto bookmark);
 	
-	List<ResultAptBookmarkDto> findBookmarkDetailsByUserId(String id);
+	List<ResultBookmarkDto> findBookmarkDetailsByUserId(String id);
 
 	int deleteBookmark(String userId, String aptCode);
 }

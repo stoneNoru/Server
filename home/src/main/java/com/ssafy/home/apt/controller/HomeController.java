@@ -1,5 +1,6 @@
 package com.ssafy.home.apt.controller;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 import org.apache.ibatis.javassist.NotFoundException;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ssafy.home.apt.dto.AptBookmarkDto;
 import com.ssafy.home.apt.dto.DealDto;
 import com.ssafy.home.apt.dto.PositionDto;
-import com.ssafy.home.apt.dto.ResultAptBookmarkDto;
+import com.ssafy.home.apt.dto.ResultBookmarkDto;
 import com.ssafy.home.apt.dto.SearchDto;
 import com.ssafy.home.apt.model.service.HomeService;
 import com.ssafy.home.exception.UnAuthorizedException;
@@ -121,7 +122,7 @@ public class HomeController {
 		}
 		
 		
-		List<ResultAptBookmarkDto> list = homeService.findBookmarkDetailsByUserId(userInfo.getId());
+		List<ResultBookmarkDto> list = homeService.findBookmarkDetailsByUserId(userInfo.getId());
 		
         return ResponseEntity.status(HttpStatus.OK.value()).body(new ResultDto(HttpStatus.OK.value(), "성공적으로 조회하였습니다.", list));
     }
