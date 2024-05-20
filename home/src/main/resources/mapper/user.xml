@@ -41,8 +41,7 @@
 
     <update id="updateUser" parameterType="user">
         update user
-        set password=#{password}
-        <if test="email != null and nickname != null">, email=#{email}, nickname=#{nickname}</if>
+        set password=#{password}, email=#{email}, nickname=#{nickname}
         where id=#{id}
     </update>
 
@@ -69,6 +68,12 @@
 		set token = #{token, jdbcType=VARCHAR}
 		where id = #{userId}
 	</update>
+	
+	<select id="findByIdAndEmail" parameterType="userPwDto" resultType="user">
+		select *
+		from user
+		where id = #{id} and email = #{email}
+	</select>
 </mapper>
 
         <!--     //내 정보 수정

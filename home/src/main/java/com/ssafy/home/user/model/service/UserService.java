@@ -1,6 +1,9 @@
 package com.ssafy.home.user.model.service;
 
+import org.apache.ibatis.javassist.NotFoundException;
+
 import com.ssafy.home.user.dto.User;
+import com.ssafy.home.user.dto.UserPwDto;
 
 public interface UserService {
     //회원 가입
@@ -26,4 +29,8 @@ public interface UserService {
 	void deleteRefreshToken(String userId) throws Exception;
 
 	Object getRefreshToken(String id) throws Exception;
+
+	void findPassword(UserPwDto user) throws NotFoundException;
+
+
 }

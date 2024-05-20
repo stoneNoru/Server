@@ -22,6 +22,7 @@ import com.ssafy.home.exception.UnAuthorizedException;
 import com.ssafy.home.exception.UserNotFoundException;
 import com.ssafy.home.status.DuplicateHttpStatus;
 import com.ssafy.home.user.dto.User;
+import com.ssafy.home.user.dto.UserPwDto;
 import com.ssafy.home.user.model.service.UserService;
 import com.ssafy.home.util.AuthorizationUtils;
 import com.ssafy.home.util.JWTUtil;
@@ -54,8 +55,17 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "로그아웃에 실패했습니다."));
 		}
 
-		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "삭제에 성공했습니다."));
+		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "로그아웃에 성공했습니다."));
 	}
+	
+	@PostMapping("/find-password")
+	public ResponseEntity<?> findPW(@RequestBody UserPwDto user) throws NotFoundException {
+		userService.findPassword(user);
+		
+		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "성공적으로 이메일에 비밀번호를 보냈습니다."));
+//		return entity;
+	}
+	
 
 	
 	@PostMapping("/refresh")

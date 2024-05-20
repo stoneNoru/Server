@@ -3,11 +3,15 @@ package com.ssafy.home.user.model.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ssafy.home.exception.UserNotFoundException;
+import com.ssafy.home.user.dto.MailDto;
 import com.ssafy.home.user.dto.User;
+import com.ssafy.home.user.dto.UserPwDto;
 import com.ssafy.home.user.model.mapper.UserMapper;
 import com.ssafy.home.util.JWTUtil;
 
@@ -20,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final JWTUtil jwtUtil;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final SendEmailservice sendEmailservice;
 
     @Override
     public String regist(User user) {
@@ -51,6 +56,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int updateUser(User user) {
+    	String encodedPassword = passwordEncoder.encode(user.getPassword());
+    	System.out.println(encodedPassword);
+    	user.setPassword(encodedPassword);
         return userMapper.updateUser(user);
     }
 
@@ -79,5 +87,25 @@ public class UserServiceImpl implements UserService {
 		map.put("token", null);
 		userMapper.deleteRefreshToken(map);
 	}
+
+	@Override
+	public void findPassword(UserPwDto reqUser) throws NotFoundException {
+		User user = userMapper.findByIdAndEmail(reqUser);
+		if(user == null) {
+			throw new UserNotFoundException();
+		}
+		else {
+			sendEmail(reqUser);
+		}
+		
+	}
+
+	private void sendEmail(UserPwDto reqUser) {
+		MailDto mail = sendEmailservice.createMailAndChargePassword(reqUser);
+		
+		sendEmailservice.mailSend(mail);
+	}
+	
+	
     
 }

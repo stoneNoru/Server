@@ -1,6 +1,7 @@
 package com.ssafy.home.user.model.mapper;
 
 import com.ssafy.home.user.dto.User;
+import com.ssafy.home.user.dto.UserPwDto;
 
 import java.util.Map;
 
@@ -32,6 +33,8 @@ public interface UserMapper {
 	void deleteRefreshToken(Map<String, String> map);
 
 	Object getRefreshToken(String userId);
+
+	User findByIdAndEmail(UserPwDto reqUser);
 	
 
 }
