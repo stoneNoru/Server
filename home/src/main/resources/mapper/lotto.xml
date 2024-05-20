@@ -22,7 +22,7 @@
     <select id="findNewLotto" resultType="lotto">
         select *
         from lotto
-        WHERE rcept_bgnde >= CURDATE()
+        WHERE rcept_bgnde > CURDATE()
     </select>
     
 	<select id="findCurrentLotto" resultType="lotto">
