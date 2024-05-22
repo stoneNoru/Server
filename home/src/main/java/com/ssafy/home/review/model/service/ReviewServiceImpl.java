@@ -17,8 +17,8 @@ public class ReviewServiceImpl implements ReviewService {
 	
 
 	@Override
-	public List<ReviewDto> findByApplyId(String id) {
-		return reviewMapper.findByApplyId(id);
+	public List<ReviewDto> findByApplyId(String houseManageNo, String userId) {
+		return reviewMapper.findByApplyId(houseManageNo, userId);
 	}
 
 

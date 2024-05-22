@@ -8,7 +8,7 @@ import com.ssafy.home.review.dto.ReviewDto;
 
 @Repository
 public interface ReviewMapper {
-	List<ReviewDto> findByApplyId(String id);
+	List<ReviewDto> findByApplyId(String houseManageNo, String userId);
 	
 	int regist(ReviewDto review);
 	

@@ -8,4 +8,5 @@ public class ReviewDto {
 	private String content;
 	private String nickname;
 	private String houseManageNo;
+	private int isMyReview;
 }

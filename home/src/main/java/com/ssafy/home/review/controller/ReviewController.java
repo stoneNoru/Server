@@ -41,10 +41,12 @@ public class ReviewController {
 	private final JWTUtil jwtUtil;
     private final AuthorizationUtils authorizationUtils;
 
-	@GetMapping("/{id}")
-	public ResponseEntity<?> findByApplyId(@PathVariable("id") String id) {
+	@GetMapping("/{houseManageNo}")
+	public ResponseEntity<?> findByApplyId(@RequestHeader("authorization") HttpHeaders tokenHeader, @PathVariable("houseManageNo") String houseManageNo) throws UserNotFoundException, UnAuthorizedException {
+		
+		User userInfo = authorizationUtils.getUserInfoFromToken(tokenHeader);
 
-		List<ReviewDto> list = reviewService.findByApplyId(id);		
+		List<ReviewDto> list = reviewService.findByApplyId(houseManageNo, userInfo.getId());		
 
 		return ResponseEntity.status(HttpStatus.OK.value()).body(ResultDto.res(HttpStatus.OK.value(), "조회에 성공했습니다.", list));
 	}

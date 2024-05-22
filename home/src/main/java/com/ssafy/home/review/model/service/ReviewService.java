@@ -6,7 +6,7 @@ import com.ssafy.home.review.dto.ReviewDto;
 
 public interface ReviewService {
 
-	List<ReviewDto> findByApplyId(String id);
+	List<ReviewDto> findByApplyId(String houseManageNo, String userId);
 
 	int regist(ReviewDto review);
 
