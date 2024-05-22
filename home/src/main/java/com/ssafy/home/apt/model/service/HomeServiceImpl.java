@@ -52,15 +52,31 @@ public class HomeServiceImpl implements HomeService{
 	}
 
 	@Override
-	public List<ResultBookmarkDto> findBookmarkDetailsByUserId(String id) {
-		return homeMapper.findBookmarkDetailsByUserId(id);
+	public List<DealDto> findBookmarkDetailsByUserId(String id) {
+		List<String> aptCodeList = homeMapper.selectByUserId(id);
+		List<DealDto> list = new ArrayList<>();
+		for(String aptCode:aptCodeList) {
+		    Map<String, Object> paramMap = new HashMap<>();
+		    paramMap.put("aptCode", aptCode);
+		    DealDto deal = homeMapper.selectByNew(paramMap);
+		    list.add(deal);
+		}
+		
+		
+		return list;
 	}
 
 	@Override
 	public int deleteBookmark(String userId, String aptCode) {
 		return homeMapper.deleteBookmark(userId, aptCode);
 	}
+
+	@Override
+	public int findBookmarkByIdAndAptCode(String aptCode, String userId) {
+		return homeMapper.findBookmarkByIdAndAptCode(aptCode, userId);
+	}
     
+	
 	
     
 }
