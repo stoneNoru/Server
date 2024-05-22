@@ -4,9 +4,13 @@
 
 <mapper namespace="com.ssafy.home.review.model.mapper.ReviewMapper">
 	<select id="findByApplyId">
-		select *
+		select *,
+    CASE 
+        WHEN nickname = (SELECT nickname FROM user WHERE id = #{userId}) THEN 1
+        ELSE 0
+    END AS isMyReview
 		from lotto_review
-		where house_manage_no = #{id}
+		where house_manage_no = #{houseManageNo}
 	</select>
 	
     <insert id="regist" parameterType="reviewDto">
