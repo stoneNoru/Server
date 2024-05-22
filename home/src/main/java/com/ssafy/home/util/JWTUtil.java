@@ -104,7 +104,7 @@ public class JWTUtil {
             throw new UnAuthorizedException();
         }
         Claims body = claims.getBody();
-        log.info("value : {}", body);
+        log.debug("value : {}", body);
         return body.get("userId", String.class);
 	}
 }

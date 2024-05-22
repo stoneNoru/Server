@@ -24,7 +24,7 @@ public class AuthorizationUtils {
 	    List<String> authorizationHeader = tokenHeader.get(HttpHeaders.AUTHORIZATION);
 	    if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
 	        String token = authorizationHeader.get(0);
-	        log.info(token);
+	        log.debug(token);
 	        String userId = jwtUtil.getUserId(token);
 	        User userInfo = userService.findById(userId);
 	        if (userInfo != null) {

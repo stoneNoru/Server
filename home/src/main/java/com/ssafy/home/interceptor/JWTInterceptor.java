@@ -29,10 +29,10 @@ public class JWTInterceptor implements HandlerInterceptor {
 		
 
 		if (token != null && jwtUtil.checkToken(token)) {
-			log.info("토큰 사용 가능 : {}", token);
+			log.debug("토큰 사용 가능 : {}", token);
 			return true;
 		} else {
-			log.info("토큰 사용 불가능 : {}", token);
+			log.debug("토큰 사용 불가능 : {}", token);
 			throw new UnAuthorizedException();
 		}
 
