@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.home.exception.UnAuthorizedException;
 import com.ssafy.home.exception.UserNotFoundException;
+import com.ssafy.home.exception.UserPasswordNotMatchException;
 import com.ssafy.home.status.DuplicateHttpStatus;
 import com.ssafy.home.user.dto.User;
 import com.ssafy.home.user.dto.UserPwDto;
@@ -41,15 +42,15 @@ public class UserController {
 	private final UserService userService;
 	private final JWTUtil jwtUtil;
 	private final AuthorizationUtils authorizationUtils;
-	
+
 	//로그아웃
 	@GetMapping("/logout")
 	public ResponseEntity<?> removeToken(@RequestHeader("authorization") HttpHeaders tokenHeader) throws UserNotFoundException, UnAuthorizedException {
-		log.info("logout");
+		log.debug("logout");
 		User userInfo = authorizationUtils.getUserInfoFromToken(tokenHeader);
-    	
-    	
-    	try {
+
+
+		try {
 			userService.deleteRefreshToken(userInfo.getId());
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "로그아웃에 실패했습니다."));
@@ -57,17 +58,17 @@ public class UserController {
 
 		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "로그아웃에 성공했습니다."));
 	}
-	
+
 	@PostMapping("/find-password")
 	public ResponseEntity<?> findPW(@RequestBody UserPwDto user) throws NotFoundException {
 		userService.findPassword(user);
-		
-		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "성공적으로 이메일에 비밀번호를 보냈습니다."));
-//		return entity;
-	}
-	
 
-	
+		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "성공적으로 이메일에 비밀번호를 보냈습니다."));
+		//		return entity;
+	}
+
+
+
 	@PostMapping("/refresh")
 	public ResponseEntity<?> refreshToken(@RequestBody User user, HttpServletRequest request)
 			throws Exception {
@@ -91,35 +92,42 @@ public class UserController {
 		}
 		return ResponseEntity.ok(ResultDto.res(status.value(), message, resultMap));
 	}
-	
+
 
 	//로그인
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody User user) {
-		
-		User userInfo = userService.login(user);
+	public ResponseEntity<?> login(@RequestBody User user) throws UserNotFoundException, UserPasswordNotMatchException {
+		User userInfo = userInfo = userService.login(user);
+		//		try {
+		//			userInfo = userService.login(user);
+		//		}
+		//		catch (UserNotFoundException e) {
+		//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 회원입니다.");
+		//		}
+		//		catch (UserPasswordNotMatchException e) {
+		//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("비밀번호가 일치하지 않습니다.");
+		//		}
+		//		if(userInfo==null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 회원입니다.");
 
-		if(userInfo==null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 회원입니다.");
-		
 
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		try {
 			String accessToken = jwtUtil.createAccessToken(userInfo.getId());
 			String refreshToken = jwtUtil.createRefreshToken(userInfo.getId());
-			
+
 			userService.saveRefreshToken(userInfo.getId(), refreshToken);
 			resultMap.put("access-token", accessToken);
-//			resultMap.put("refresh-token", refreshToken);
+			//			resultMap.put("refresh-token", refreshToken);
 			resultMap.put("userInfo", userInfo);
-			
+
 			System.out.println(resultMap.get("access-token"));
-//			System.out.println(resultMap.get("refresh-token"));
-			
+			//			System.out.println(resultMap.get("refresh-token"));
+
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResultDto.res(HttpStatus.NOT_FOUND.value(), "로그인에 실패 했습니다."));
 		}
 
-		
+
 		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "로그인에 성공했습니다.", resultMap));
 	}
 
@@ -135,7 +143,35 @@ public class UserController {
 				return ResponseEntity.status(HttpStatus.CONFLICT.value()).body(new ResultDto(HttpStatus.CONFLICT.value(), "회원가입에 실패했습니다."));
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(DuplicateHttpStatus.DUPLICATE.value()).body(new ResultDto(DuplicateHttpStatus.DUPLICATE.value(), "중복된 회원이 존재합니다."));
+			log.debug(e.getMessage());
+			// MySQL 예외 메시지 예시: "Duplicate entry 'some_value' for key 'unique_key_name'"
+			String message = e.getMessage();
+			String columnName = null;
+			String keyPrefix = "for key '";
+			int keyStart = message.indexOf(keyPrefix);
+			if (keyStart != -1) {
+				int keyEnd = message.indexOf("'", keyStart + keyPrefix.length());
+				if (keyEnd != -1) {
+					columnName = message.substring(keyStart + keyPrefix.length(), keyEnd);
+				}
+			}
+
+			String name = "";
+			switch (columnName) {
+			case "nickname_UNIQUE":
+				name = "닉네임이";
+				break;
+			case "email_UNIQUE":
+				name = "이메일이";
+				break;
+			default:
+				name = "아이디가";
+			}
+
+			log.debug(name);
+			log.debug(columnName);
+
+			return ResponseEntity.status(DuplicateHttpStatus.DUPLICATE.value()).body(new ResultDto(DuplicateHttpStatus.DUPLICATE.value(), "중복된 "+name+" 존재합니다."));
 		}
 	}
 
@@ -144,8 +180,8 @@ public class UserController {
 	//중복 체크
 	@GetMapping("/check")
 	public ResponseEntity<?> duplicateCheck(@RequestParam(required = false) String email,
-											@RequestParam(required = false) String id,
-											@RequestParam(required = false) String nickname) {
+			@RequestParam(required = false) String id,
+			@RequestParam(required = false) String nickname) {
 		if (email != null) {
 			User user = new User();
 			user.setEmail(email);
@@ -193,11 +229,42 @@ public class UserController {
 	@PutMapping
 	public ResponseEntity<?> updateUserInfo(@RequestBody User user, @RequestHeader("authorization") HttpHeaders tokenHeader) throws UserNotFoundException, UnAuthorizedException {
 		User userInfo = authorizationUtils.getUserInfoFromToken(tokenHeader);
-		
+
 		user.setId(userInfo.getId());
+		try {
+			int result = userService.updateUser(user);
+		}
+		catch (Exception e) {
+			log.debug(e.getMessage());
+			// MySQL 예외 메시지 예시: "Duplicate entry 'some_value' for key 'unique_key_name'"
+			String message = e.getMessage();
+			String columnName = null;
+			String keyPrefix = "for key '";
+			int keyStart = message.indexOf(keyPrefix);
+			if (keyStart != -1) {
+				int keyEnd = message.indexOf("'", keyStart + keyPrefix.length());
+				if (keyEnd != -1) {
+					columnName = message.substring(keyStart + keyPrefix.length(), keyEnd);
+				}
+			}
 
-		int result = userService.updateUser(user);
+			String name = "";
+			switch (columnName) {
+			case "nickname_UNIQUE":
+				name = "닉네임이";
+				break;
+			case "email_UNIQUE":
+				name = "이메일이";
+				break;
+			default:
+				name = "아이디가";
+			}
 
+			log.debug(name);
+			log.debug(columnName);
+
+			return ResponseEntity.status(DuplicateHttpStatus.DUPLICATE.value()).body(new ResultDto(DuplicateHttpStatus.DUPLICATE.value(), "중복된 "+name+" 존재합니다."));
+		}
 		return ResponseEntity.ok().body(new ResultDto(HttpStatus.OK.value(), "수정에 성공했습니다."));
 	}
 
@@ -206,9 +273,9 @@ public class UserController {
 	@DeleteMapping
 	public ResponseEntity<?> deleteUser(@RequestHeader("authorization") HttpHeaders tokenHeader) throws UserNotFoundException, UnAuthorizedException {
 		User userInfo = authorizationUtils.getUserInfoFromToken(tokenHeader);
-    	
 
-    	int result = userService.deleteUser(userInfo.getId());
+
+		int result = userService.deleteUser(userInfo.getId());
 		if (result==0) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "유저 정보를 찾을 수 없습니다."));
 		}

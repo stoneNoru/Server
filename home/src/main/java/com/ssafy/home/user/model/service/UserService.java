@@ -2,6 +2,8 @@ package com.ssafy.home.user.model.service;
 
 import org.apache.ibatis.javassist.NotFoundException;
 
+import com.ssafy.home.exception.UserNotFoundException;
+import com.ssafy.home.exception.UserPasswordNotMatchException;
 import com.ssafy.home.user.dto.User;
 import com.ssafy.home.user.dto.UserPwDto;
 
@@ -10,7 +12,7 @@ public interface UserService {
     String regist(User user);
 
     //로그인
-    User login(User user);
+    User login(User user) throws UserNotFoundException, UserPasswordNotMatchException;
 
     //중복 조회
     int findUser(User user);

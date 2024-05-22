@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.home.exception.UserNotFoundException;
+import com.ssafy.home.exception.UserPasswordNotMatchException;
 import com.ssafy.home.user.dto.MailDto;
 import com.ssafy.home.user.dto.User;
 import com.ssafy.home.user.dto.UserPwDto;
@@ -16,9 +17,11 @@ import com.ssafy.home.user.model.mapper.UserMapper;
 import com.ssafy.home.util.JWTUtil;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
@@ -29,17 +32,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public String regist(User user) {
     	String encodedPassword = passwordEncoder.encode(user.getPassword());
-    	System.out.println(encodedPassword);
+    	log.debug(encodedPassword);
     	user.setPassword(encodedPassword);
     	userMapper.regist(user);
         return jwtUtil.createAccessToken(user.getId());
     }
 
     @Override
-    public User login(User user) {
+    public User login(User user) throws UserNotFoundException, UserPasswordNotMatchException {
 		User userInfo = userMapper.login(user);	//DB로부터 조회한 정보
-		System.out.println(userInfo+" userInfo");
-		if(userInfo==null || !passwordEncoder.matches(user.getPassword(), userInfo.getPassword()) ) return null;
+		log.debug(userInfo+" userInfo");
+		if(userInfo==null) throw new UserNotFoundException();
+		if(!passwordEncoder.matches(user.getPassword(), userInfo.getPassword())) throw new UserPasswordNotMatchException();
 		userInfo.setPassword(null);
 		return userInfo;
     }
@@ -57,7 +61,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public int updateUser(User user) {
     	String encodedPassword = passwordEncoder.encode(user.getPassword());
-    	System.out.println(encodedPassword);
+       	log.debug(encodedPassword);
     	user.setPassword(encodedPassword);
         return userMapper.updateUser(user);
     }

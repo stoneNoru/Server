@@ -32,6 +32,11 @@ public class MyAdvice {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "유저 정보를 찾을 수 없습니다."));
 	}
 	
+	@ExceptionHandler(UserPasswordNotMatchException.class)
+	public ResponseEntity<?> userPasswordNotMatchException() {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "비밀번호가 일치하지 않습니다."));
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<?> Exception() {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.value()).body(new ResultDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 에러입니다."));
