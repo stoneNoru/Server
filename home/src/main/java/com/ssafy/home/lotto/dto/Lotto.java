@@ -56,5 +56,6 @@ public class Lotto {
 
 	private String pblancUrl;
 
+	private int bookmark;
 	
 }

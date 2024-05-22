@@ -18,8 +18,8 @@ public class LottoServiceImpl implements LottoService {
 	private final LottoMapper lottoMapper;
 
 	@Override
-	public List<Lotto> selectEndLotto() {
-		return lottoMapper.selectEndLotto();
+	public List<Lotto> selectEndLotto(String userId) {
+		return lottoMapper.selectEndLotto(userId);
 	}
 
 	@Override
@@ -28,13 +28,13 @@ public class LottoServiceImpl implements LottoService {
 	}
 
 	@Override
-	public List<Lotto> findNewLotto() {
-		return lottoMapper.findNewLotto();
+	public List<Lotto> findNewLotto(String userId) {
+		return lottoMapper.findNewLotto(userId);
 	}
 
 	@Override
-	public List<Lotto> findCurrentLotto() {
-		return lottoMapper.findCurrentLotto();
+	public List<Lotto> findCurrentLotto(String userId) {
+		return lottoMapper.findCurrentLotto(userId);
 	}
 
 	@Override
@@ -50,6 +50,11 @@ public class LottoServiceImpl implements LottoService {
 	@Override
 	public int deleteBookmark(String userId, String houseManageNo) {
 		return lottoMapper.deleteBookmark(userId, houseManageNo);
+	}
+
+	@Override
+	public int findBookmarkByIdAndNo(String houseManageNo, String id) {
+		return lottoMapper.findBookmarkByIdAndNo(houseManageNo, id);
 	}
 
 	

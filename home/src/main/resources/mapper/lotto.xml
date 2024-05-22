@@ -6,8 +6,17 @@
 
 
     <select id="selectEndLotto" resultType="lotto">
-        select *
-        from lotto
+        SELECT 
+            l.*, 
+            CASE 
+                WHEN s.user_id = #{userId} THEN 1 
+                ELSE 0 
+            END AS bookmark
+        FROM 
+            lotto l 
+            LEFT OUTER JOIN lotto_subscription s 
+            ON l.house_manage_no = s.house_manage_no
+            AND s.user_id = #{userId}
         WHERE rcept_endde &lt; CURDATE()
         and YEAR(rcept_endde) = YEAR(CURDATE()) 
   		AND MONTH(rcept_endde) = MONTH(CURDATE())
@@ -15,22 +24,46 @@
     
     <select id="findById" resultType="lotto">
         select *
-        from lotto
+        from lotto 
         where pblanc_no = #{id}
     </select>
     
     <select id="findNewLotto" resultType="lotto">
-        select *
-        from lotto
+        SELECT 
+            l.*, 
+            CASE 
+                WHEN s.user_id = #{userId} THEN 1 
+                ELSE 0 
+            END AS bookmark
+        FROM 
+            lotto l 
+            LEFT OUTER JOIN lotto_subscription s 
+            ON l.house_manage_no = s.house_manage_no
+            AND s.user_id = #{userId}
         WHERE rcept_bgnde > CURDATE()
     </select>
     
 	<select id="findCurrentLotto" resultType="lotto">
-        select *
-        from lotto
+        SELECT 
+            l.*, 
+            CASE 
+                WHEN s.user_id = #{userId} THEN 1 
+                ELSE 0 
+            END AS bookmark
+        FROM 
+            lotto l 
+            LEFT OUTER JOIN lotto_subscription s 
+            ON l.house_manage_no = s.house_manage_no
+            AND s.user_id = #{userId}
         WHERE CURDATE() between rcept_bgnde and rcept_endde 
     </select>
 
+	<select id="findBookmarkByIdAndNo">
+ 	    SELECT count(*)
+	    FROM lotto_subscription 
+	    WHERE user_id = #{userId} and house_manage_no = #{houseManageNo}
+	</select>
+	
 
 	<insert id="registBookmark" parameterType="lottoBookmarkDto">
         insert into lotto_subscription(house_manage_no, user_id)

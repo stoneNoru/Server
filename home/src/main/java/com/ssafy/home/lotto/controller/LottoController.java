@@ -53,21 +53,48 @@ public class LottoController {
 
 	//종료된 거 조회
 	@GetMapping("/end")
-	public ResponseEntity<?> selectEndLotto() {
-		List<Lotto> list = lottoService.selectEndLotto();
+	public ResponseEntity<?> selectEndLotto(@RequestHeader("authorization") HttpHeaders tokenHeader) {
+		User userInfo = null;
+
+		try {
+			userInfo = authorizationUtils.getUserInfoFromToken(tokenHeader);
+		} catch (NotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "유저 정보를 찾을 수 없습니다."));
+		} catch (UnAuthorizedException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(new ResultDto(HttpStatus.UNAUTHORIZED.value(), "인증에 실패했습니다."));
+		}
+		List<Lotto> list = lottoService.selectEndLotto(userInfo.getId());
 		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "종료된 청약 조회 성공", list));
 	}
 
 	@GetMapping("/new")
-	public ResponseEntity<?> getNewLotto() {
-		List<Lotto> lotto = lottoService.findNewLotto();
+	public ResponseEntity<?> getNewLotto(@RequestHeader("authorization") HttpHeaders tokenHeader) {
+		User userInfo = null;
+
+		try {
+			userInfo = authorizationUtils.getUserInfoFromToken(tokenHeader);
+		} catch (NotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "유저 정보를 찾을 수 없습니다."));
+		} catch (UnAuthorizedException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(new ResultDto(HttpStatus.UNAUTHORIZED.value(), "인증에 실패했습니다."));
+		}
+		List<Lotto> lotto = lottoService.findNewLotto(userInfo.getId());
 		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "최신 청약 조회 성공", lotto));
 	}
 
 
 	@GetMapping("/current")
-	public ResponseEntity<?> getCurrentLotto() {
-		List<Lotto> lotto = lottoService.findCurrentLotto();
+	public ResponseEntity<?> getCurrentLotto(@RequestHeader("authorization") HttpHeaders tokenHeader) {
+		User userInfo = null;
+
+		try {
+			userInfo = authorizationUtils.getUserInfoFromToken(tokenHeader);
+		} catch (NotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "유저 정보를 찾을 수 없습니다."));
+		} catch (UnAuthorizedException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(new ResultDto(HttpStatus.UNAUTHORIZED.value(), "인증에 실패했습니다."));
+		}
+		List<Lotto> lotto = lottoService.findCurrentLotto(userInfo.getId());
 		return ResponseEntity.ok(ResultDto.res(HttpStatus.OK.value(), "진행 중인 청약 조회 성공", lotto));
 	}
 
@@ -82,6 +109,22 @@ public class LottoController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(ResultDto.res(HttpStatus.CREATED.value(), "북마크 등록에 성공했습니다."));
     }
     
+	@GetMapping("/bookmarks/{houseManageNo}")
+	public ResponseEntity<?> getBookmark(@RequestHeader("authorization") HttpHeaders tokenHeader, @PathVariable String houseManageNo) {
+		User userInfo = null;
+
+		try {
+			userInfo = authorizationUtils.getUserInfoFromToken(tokenHeader);
+		} catch (NotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(new ResultDto(HttpStatus.NOT_FOUND.value(), "유저 정보를 찾을 수 없습니다."));
+		} catch (UnAuthorizedException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(new ResultDto(HttpStatus.UNAUTHORIZED.value(), "인증에 실패했습니다."));
+		}
+
+		int result = lottoService.findBookmarkByIdAndNo(houseManageNo, userInfo.getId());
+		
+		return ResponseEntity.ok().body(ResultDto.res(HttpStatus.OK.value(), "북마크 조회에 성공했습니다.", result));
+	}
     
     @GetMapping("/bookmarks")
     public ResponseEntity<?> findBookmarks(@RequestHeader("authorization") HttpHeaders tokenHeader) throws NotFoundException {
