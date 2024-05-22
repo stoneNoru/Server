@@ -19,7 +19,9 @@ public interface HomeService {
 
 	int registBookmark(AptBookmarkDto bookmark);
 	
-	List<ResultBookmarkDto> findBookmarkDetailsByUserId(String id);
+	List<DealDto> findBookmarkDetailsByUserId(String id);
 
 	int deleteBookmark(String userId, String aptCode);
+
+	int findBookmarkByIdAndAptCode(String aptCode, String userId);
 }

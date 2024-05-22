@@ -13,27 +13,33 @@
     </select>
     
     <select id="selectByPosition" resultType="dealDto">
-    select i.aptCode
+    select i.aptCode, CONCAT(c.sidoName, ' ', c.gugunName, ' ', c.dongName) AS road
 	from houseinfo i join housedeal d
 	on i.aptCode = d.aptCode
+	join dongcode c
+	on i.dongCode = c.dongCode
 	where i.lng &gt;= #{west} and i.lng &lt;= #{east}
 	and i.lat &gt;= #{south} and i.lat &lt;= #{north}
 	group by i.aptCode
     </select>
 
 	<select id="selectByNew" resultType="dealDto">
-	    SELECT *, CONCAT(d.dealYear, '-', d.dealMonth, '-', d.dealDay) AS date
+	    SELECT *, CONCAT(d.dealYear, '-', d.dealMonth, '-', d.dealDay) AS date, CONCAT(c.sidoName, ' ', c.gugunName, ' ', c.dongName) AS road
 	    FROM housedeal d join houseinfo i
 	    on d.aptCode = i.aptCode
+	    join dongcode c
+	    on i.dongCode = c.dongCode
 	    WHERE d.aptCode = #{aptCode}
 	    ORDER BY STR_TO_DATE(CONCAT(d.dealYear, '-', d.dealMonth, '-', d.dealDay), '%Y-%m-%d') DESC
 	    LIMIT 1;
 	</select>
 	
 	<select id="selectByCode" resultType="dealDto">
-    SELECT *, CONCAT(d.dealYear, '-', d.dealMonth, '-', d.dealDay) AS date
+    SELECT *, CONCAT(d.dealYear, '-', d.dealMonth, '-', d.dealDay) AS date, CONCAT(c.sidoName, ' ', c.gugunName, ' ', c.dongName) AS road
     FROM housedeal d 
     JOIN houseinfo i ON d.aptCode = i.aptCode
+    join dongcode c
+	on i.dongCode = c.dongCode
     WHERE d.aptCode = #{aptCode}
 	ORDER BY STR_TO_DATE(CONCAT(d.dealYear, '-', d.dealMonth, '-', d.dealDay), '%Y-%m-%d') DESC
     LIMIT #{limit}
@@ -55,6 +61,13 @@
 	    WHERE s.user_id = #{userId}
 	</select>
 	
+	<select id="findBookmarkByIdAndAptCode">
+ 	    SELECT count(*)
+	    FROM house_subscription 
+	    WHERE user_id = #{userId} and aptCode = #{aptCode}
+	</select>
+	
+	
 	<insert id="registBookmark" parameterType="aptBookmarkDto">
         insert into house_subscription(aptCode, user_id)
         values(#{aptCode}, #{userId})
@@ -66,10 +79,18 @@
 		JOIN houseinfo i ON s.aptCode = i.aptCode
 		JOIN dongcode d ON i.dongCode = d.dongCode
 		JOIN housedeal h ON s.aptCode = h.aptCode
-		WHERE s.user_id = #{id}
+		WHERE s.user_id = #{userId}
+        group by s.aptCode
 		ORDER BY STR_TO_DATE(CONCAT(h.dealYear, '-', h.dealMonth, '-', h.dealDay), '%Y-%m-%d') DESC
 		limit 1;
 	</select>
+	
+	<select id="selectByUserId">
+		select aptCode
+		from house_subscription
+		where user_id = #{userId}
+	</select>
+	
 	
 	<resultMap id="BookmarkDetailResultMap" type="resultBookmarkDto">
 	    <result property="apartmentName" column="apartmentName"/>

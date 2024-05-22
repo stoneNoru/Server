@@ -17,5 +17,5 @@ public class DealDto {
 	private String lng;
 	private String lat;
 	private String date;
-	
+	private String road;
 }

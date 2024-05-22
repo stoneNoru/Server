@@ -1,6 +1,5 @@
 package com.ssafy.home.apt.model.mapper;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,11 +18,14 @@ public interface HomeMapper {
 	
 	List<DealDto> selectByCode(String aptCode, int limit);
 	
+	int findBookmarkByIdAndAptCode(String aptCode, String userId);
 	
 	int registBookmark(AptBookmarkDto bookmark);
 	
-	List<ResultBookmarkDto> findBookmarkDetailsByUserId(String id);
+	List<ResultBookmarkDto> findBookmarkDetailsByUserId(String userId);
 	
 	int deleteBookmark(String userId, String aptCode);
+	
+	List<String> selectByUserId(String userId);
 }
 
